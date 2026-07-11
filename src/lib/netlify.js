@@ -65,15 +65,35 @@ export async function disconnectNetlify() {
   await fetch('/api/netlify/disconnect', { method: 'POST' })
 }
 
+// utf8 string → base64 (chunked so large files don't blow the call stack).
+function utf8ToBase64(str) {
+  const bytes = new TextEncoder().encode(str)
+  let bin = ''
+  const chunk = 0x8000
+  for (let i = 0; i < bytes.length; i += chunk) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk))
+  }
+  return btoa(bin)
+}
+
 // Deploy the current project. Reuses the exact export pipeline (assembleSite),
 // so the deployed output is byte-identical to the ZIP/manual output.
 // Returns { siteId, url }.
+//
+// File contents are base64-encoded before sending: a shared host's WAF
+// (mod_security) rejects request bodies that contain raw HTML/CSS/JS as a
+// suspected injection. The server decodes base64 back to the exact bytes, so
+// the deployed output is unchanged.
 export async function publishToNetlify(config, siteId) {
   const { files } = assembleSite(config)
+  const encoded = {}
+  for (const [path, f] of Object.entries(files)) {
+    encoded[path] = f.encoding === 'base64' ? f : { data: utf8ToBase64(f.data), encoding: 'base64' }
+  }
   const res = await fetch('/api/netlify/deploy', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ siteId: siteId || null, files }),
+    body: JSON.stringify({ siteId: siteId || null, files: encoded }),
   })
   return j(res)
 }
