@@ -14,8 +14,8 @@ const DESTINATIONS = {
   netlify: {
     label: 'Netlify Forms (zero setup)',
     field: null,
-    hint: 'Nothing to paste. Deploy to Netlify (below) and submissions appear in your Netlify dashboard — turn on email alerts there.',
-    status: 'Visitors stay on your own thank-you page. Works only when you deploy to Netlify.',
+    hint: 'Nothing to paste. Publish to Netlify below — Buildrr auto-enables form detection, so submissions land in your site’s Forms tab (set email alerts there).',
+    status: 'Visitors stay on your own thank-you page. Works only when you publish to Netlify.',
     tone: 'good',
   },
   kit: {

@@ -78,6 +78,19 @@ export async function deploy(token, siteId, files) {
     })
   }
 
+  // 2b. Netlify disables form detection by default on API-created sites, so
+  // Netlify Forms in the deployed HTML are never registered (submissions 404).
+  // Turn it on before deploying so this deploy gets scanned. Non-fatal.
+  try {
+    await api(token, `/sites/${site.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ processing_settings: { ignore_html_forms: false } }),
+    })
+  } catch (e) {
+    console.warn('Could not enable Netlify form detection:', e.message)
+  }
+
   // 3. Open a deploy with the file digest.
   const digest = {}
   for (const e of entries) digest[e.key] = e.sha
