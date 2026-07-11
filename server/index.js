@@ -55,14 +55,17 @@ app.get('/api/netlify/status', (req, res) => {
 })
 
 // Popup opens this; we bounce to Netlify's OAuth consent screen.
-app.get('/api/netlify/connect', (req, res) => {
+// Accept both path styles so it works whichever the redirect URI uses.
+app.get(['/api/netlify/connect', '/api/auth/netlify/connect'], (req, res) => {
   if (!isConfigured()) return res.status(503).send('Netlify integration is not configured on this server.')
   const sid = ensureSid(req, res)
   res.redirect(authorizeUrl(sid)) // state = sid, verified on callback
 })
 
-// Netlify redirects the popup back here with ?code&state.
-app.get('/api/netlify/callback', async (req, res) => {
+// Netlify redirects the popup back here with ?code&state. Accept both the
+// canonical path and the /api/auth/... variant (whatever the OAuth app's
+// redirect URI is set to).
+app.get(['/api/netlify/callback', '/api/auth/netlify/callback'], async (req, res) => {
   const sid = readSid(req)
   const { code, state, error } = req.query
   const close = (msg, ok) =>
