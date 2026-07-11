@@ -221,7 +221,14 @@ export default function Home({ onOpen }) {
                       <i>Sales</i>
                       <i>Site</i>
                     </span>
-                    <span className="ma-export">⤓ Export</span>
+                    <span className="ma-export">
+                      <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M3 12h18" />
+                        <path d="M12 3a15 15 0 0 1 4 9 15 15 0 0 1-4 9 15 15 0 0 1-4-9 15 15 0 0 1 4-9z" />
+                      </svg>
+                      Publish
+                    </span>
                   </div>
                   <div className="ma-body">
                     <div className="ma-side">
