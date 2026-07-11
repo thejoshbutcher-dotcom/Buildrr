@@ -147,6 +147,49 @@ const previewScript = `<script>
 })();
 </script>`
 
+// Clean "Preview" mode: the page as it will publish — no contenteditable, no
+// edit outlines, no section-focus. Still routes internal links / demo form
+// submits up so multi-page navigation and the thank-you flow work in the frame.
+const viewScript = `<script>
+(function () {
+  function formIntent(form) {
+    if (!form) return;
+    var mode = form.getAttribute("data-capture") || "thanks";
+    var thanks = form.getAttribute("data-thanks") || "thank-you.html";
+    if (mode === "thanks") parent.postMessage({ buildrr: "nav", page: thanks }, "*");
+    else parent.postMessage({ buildrr: "form", mode: mode }, "*");
+  }
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      var field = e.target.closest && e.target.closest("[data-form] input");
+      if (field) { e.preventDefault(); formIntent(field.closest("[data-form]")); }
+    }
+  });
+  document.addEventListener("click", function (e) {
+    var buy = e.target.closest('[data-buy="missing"]');
+    if (buy) { e.preventDefault(); parent.postMessage({ buildrr: "setup-checkout" }, "*"); return; }
+    var a = e.target.closest("a");
+    if (a) {
+      var href = a.getAttribute("href") || "";
+      e.preventDefault();
+      if (href.charAt(0) === "#") {
+        var tgt = href.length > 1 && document.getElementById(href.slice(1));
+        if (tgt) tgt.scrollIntoView({ behavior: "smooth", block: "start" });
+        else window.scrollTo({ top: 0, behavior: "smooth" });
+      } else if (href.endsWith(".html")) parent.postMessage({ buildrr: "nav", page: href }, "*");
+      else if (/^https?:/i.test(href)) parent.postMessage({ buildrr: "external", url: href }, "*");
+      else if (href) parent.postMessage({ buildrr: "external", url: "https://" + href.replace(/^\\/+/, "") }, "*");
+      return;
+    }
+  }, true);
+  document.addEventListener("submit", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    formIntent(e.target);
+  }, true);
+})();
+</script>`
+
 const noAnimStyle = '<style>.reveal{opacity:1!important;transform:none!important;transition:none!important}</style>'
 
 // Friendly description of what a form submit does on the live site.
@@ -180,14 +223,17 @@ function useDebounced(value, ms) {
   return v
 }
 
-export default function Preview({ config, device, activePage, setActivePage, toast, onEdit, onSectionFocus, onSetupCheckout }) {
+export default function Preview({ config, device, activePage, setActivePage, toast, onEdit, onSectionFocus, onSetupCheckout, mode = 'edit' }) {
   const debounced = useDebounced(config, 350)
   const iframeRef = React.useRef(null)
   const scrollMemo = React.useRef({})
   const [animKey, setAnimKey] = React.useState(0)
   const [animate, setAnimate] = React.useState(false)
 
-  const built = React.useMemo(() => buildFiles(debounced, { preview: true, previewScript }), [debounced])
+  const built = React.useMemo(
+    () => buildFiles(debounced, { preview: true, previewScript: mode === 'preview' ? viewScript : previewScript }),
+    [debounced, mode],
+  )
   const page = built.files[activePage] ? activePage : 'index.html'
   const html = animate ? built.files[page] : built.files[page].replace('</head>', `${noAnimStyle}</head>`)
 
@@ -199,6 +245,11 @@ export default function Preview({ config, device, activePage, setActivePage, toa
   React.useEffect(() => {
     if (!editing) setDisplayHtml(html)
   }, [html, editing])
+
+  // Preview mode has no inline editing, so never leave the frame frozen.
+  React.useEffect(() => {
+    if (mode === 'preview') setEditing(false)
+  }, [mode])
 
   // Content edits regenerate with animations off so the page doesn't flicker.
   React.useEffect(() => {

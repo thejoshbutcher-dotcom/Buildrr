@@ -53,6 +53,7 @@ export default function App({ onHome = () => {} }) {
   const [config, setConfig] = React.useState(initialConfig)
   const [tab, setTab] = React.useState('content')
   const [device, setDevice] = React.useState('desktop')
+  const [mode, setMode] = React.useState('edit') // 'edit' | 'preview'
   const [activePage, setActivePage] = React.useState('index.html')
   const [toastMsg, setToastMsg] = React.useState(null)
   const toastTimer = React.useRef(null)
@@ -170,6 +171,14 @@ export default function App({ onHome = () => {} }) {
           ))}
         </div>
         <div className="topbar-spacer" />
+        <div className="seg mini" role="tablist" aria-label="Editing mode">
+          <button className={mode === 'edit' ? 'on' : ''} onClick={() => setMode('edit')} title="Edit the page inline">
+            Edit
+          </button>
+          <button className={mode === 'preview' ? 'on' : ''} onClick={() => setMode('preview')} title="See the page as it will publish — no editing outlines">
+            Preview
+          </button>
+        </div>
         <div className="seg mini" role="tablist" aria-label="Preview device">
           <button className={device === 'desktop' ? 'on' : ''} onClick={() => setDevice('desktop')}>
             Desktop
@@ -251,6 +260,7 @@ export default function App({ onHome = () => {} }) {
         <Preview
           config={config}
           device={device}
+          mode={mode}
           activePage={activePage}
           setActivePage={setActivePage}
           toast={toast}
