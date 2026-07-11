@@ -1,9 +1,11 @@
 import React from 'react'
-import { netlifyStatus, connectNetlify, disconnectNetlify, publishToNetlify } from '../lib/netlify.js'
+import { netlifyStatus, connectNetlify, disconnectNetlify, deleteNetlifySite, publishToNetlify } from '../lib/netlify.js'
 
 // One-click publish to the user's own Netlify account. Falls back to the manual
 // drag-and-drop instructions when the server/OAuth app isn't available.
-export default function NetlifyPublish({ config, siteId, url, onSaved }) {
+// onForget: clear this page's saved site (local only). onDisconnect: clear every
+// page's saved site (called alongside revoking the token).
+export default function NetlifyPublish({ config, siteId, url, onSaved, onForget, onDisconnect }) {
   const [st, setSt] = React.useState({ available: false, configured: false, connected: false, loading: true })
   const [phase, setPhase] = React.useState('idle') // idle | connecting | deploying | error
   const [error, setError] = React.useState('')
@@ -55,6 +57,32 @@ export default function NetlifyPublish({ config, siteId, url, onSaved }) {
     setTimeout(() => setCopied(false), 1600)
   }
 
+  const del = async () => {
+    setError('')
+    if (!window.confirm(`Permanently delete ${url.replace(/^https?:\/\//, '')} from Netlify?\n\nThis removes the live website and can’t be undone.`)) return
+    setPhase('deleting')
+    try {
+      if (!st.connected) {
+        await connectNetlify()
+        setSt((s) => ({ ...s, connected: true }))
+      }
+      await deleteNetlifySite(siteId)
+      onForget() // clear the local reference now that it's gone
+      setPhase('idle')
+    } catch (e) {
+      setError(e.code === 'not_connected' ? 'Connect to Netlify to delete this site.' : e.message || 'Could not delete the site.')
+      setPhase('error')
+    }
+  }
+
+  const disconnect = async () => {
+    if (!window.confirm('Disconnect Netlify?\n\nYour published sites stay live on Netlify — this just unlinks your account and clears the links shown here.')) return
+    await disconnectNetlify()
+    onDisconnect() // clear every page's saved site
+    setSt((s) => ({ ...s, connected: false }))
+    setError('')
+  }
+
   if (st.loading) return <div className="deploy-primary np-loading">Checking publish options…</div>
 
   // Server or OAuth app not set up → keep the manual path as the primary option.
@@ -74,7 +102,7 @@ export default function NetlifyPublish({ config, siteId, url, onSaved }) {
     )
   }
 
-  const busy = phase === 'connecting' || phase === 'deploying'
+  const busy = phase === 'connecting' || phase === 'deploying' || phase === 'deleting'
   const label =
     phase === 'connecting' ? 'Connecting to Netlify…' : phase === 'deploying' ? 'Publishing…' : st.connected ? '⚡ Publish to Netlify' : 'Connect Netlify & publish'
 
@@ -87,8 +115,11 @@ export default function NetlifyPublish({ config, siteId, url, onSaved }) {
 
       {phase === 'deploying' && <div className="np-note">Uploading your site to Netlify — this usually takes 10–20 seconds.</div>}
 
-      {url && phase !== 'deploying' && (
+      {url && phase !== 'deploying' && phase !== 'deleting' && (
         <div className="np-live">
+          <button className="np-dismiss" title="Remove this link from Buildrr (doesn’t touch the live site)" aria-label="Dismiss" onClick={onForget}>
+            ✕
+          </button>
           <div className="np-live-top">
             <span className="np-dot" /> Live at
           </div>
@@ -105,20 +136,18 @@ export default function NetlifyPublish({ config, siteId, url, onSaved }) {
             <button className="np-republish" onClick={deploy} disabled={busy}>
               Republish
             </button>
+            <button className="img-btn danger" onClick={del} disabled={busy}>
+              Delete site
+            </button>
           </div>
         </div>
       )}
 
+      {phase === 'deleting' && <div className="np-note">Deleting the site from Netlify…</div>}
       {error && <div className="publish-status warn">{error}</div>}
 
       {st.connected && (
-        <button
-          className="np-disconnect"
-          onClick={async () => {
-            await disconnectNetlify()
-            setSt((s) => ({ ...s, connected: false }))
-          }}
-        >
+        <button className="np-disconnect" onClick={disconnect}>
           Disconnect Netlify
         </button>
       )}

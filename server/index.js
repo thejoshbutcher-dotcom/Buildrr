@@ -6,7 +6,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { newSid, getToken, setToken, clearToken } from './store.js'
-import { isConfigured, authorizeUrl, exchangeCode, deploy } from './netlify.js'
+import { isConfigured, authorizeUrl, exchangeCode, deploy, deleteSite } from './netlify.js'
 
 // Load .env if present (no dependency; Node's --env-file is optional).
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -88,6 +88,26 @@ setTimeout(function(){ window.close() }, ${ok ? 300 : 2500})
 app.post('/api/netlify/disconnect', (req, res) => {
   clearToken(readSid(req))
   res.json({ ok: true })
+})
+
+// Permanently delete a published site from Netlify. Body: { siteId }.
+app.post('/api/netlify/delete-site', async (req, res) => {
+  const sid = readSid(req)
+  const token = getToken(sid)
+  if (!token) return res.status(401).json({ error: 'not_connected' })
+  const { siteId } = req.body || {}
+  if (!siteId) return res.status(400).json({ error: 'no_site' })
+  try {
+    await deleteSite(token, siteId)
+    res.json({ ok: true })
+  } catch (e) {
+    console.error(e)
+    if (e.status === 401) {
+      clearToken(sid)
+      return res.status(401).json({ error: 'not_connected' })
+    }
+    res.status(502).json({ error: 'delete_failed', message: String(e.message || e) })
+  }
 })
 
 // Deploy the exported site. Body: { siteId?, files: { path: { data, encoding } } }.

@@ -133,6 +133,12 @@ export default function App({ onHome = () => {} }) {
   const publish = config[config.pageType].publish
   const setPublish = (patch) =>
     setConfig((c) => setIn(c, `${c.pageType}.publish`, { ...c[c.pageType].publish, ...patch }))
+  // Disconnecting is account-level: forget the saved site on every page type.
+  const clearAllPublish = () =>
+    setConfig((c) => {
+      const blank = { netlifySiteId: '', netlifyUrl: '' }
+      return { ...c, optin: { ...c.optin, publish: blank }, sales: { ...c.sales, publish: blank }, site: { ...c.site, publish: blank } }
+    })
 
   const onExport = async () => {
     const name = await exportZip(config)
@@ -209,6 +215,7 @@ export default function App({ onHome = () => {} }) {
                 config={config}
                 publish={publish}
                 setPublish={setPublish}
+                clearAllPublish={clearAllPublish}
                 onExport={onExport}
                 toast={toast}
                 checkoutHighlight={checkoutHighlight}

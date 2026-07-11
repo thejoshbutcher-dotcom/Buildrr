@@ -212,7 +212,7 @@ function SingleHtmlExport({ config, toast }) {
   )
 }
 
-export default function PublishPanel({ pageType, capture, setCapture, content, update, config, publish, setPublish, onExport, toast, checkoutHighlight }) {
+export default function PublishPanel({ pageType, capture, setCapture, content, update, config, publish, setPublish, clearAllPublish, onExport, toast, checkoutHighlight }) {
   return (
     <div>
       <div className="design-label">{pageType === 'sales' ? 'Take payment' : 'Collect emails'}</div>
@@ -227,7 +227,14 @@ export default function PublishPanel({ pageType, capture, setCapture, content, u
       )}
 
       <div className="design-label" style={{ marginTop: 26 }}>Publish</div>
-      <NetlifyPublish config={config} siteId={publish?.netlifySiteId} url={publish?.netlifyUrl} onSaved={(netlifySiteId, netlifyUrl) => setPublish({ netlifySiteId, netlifyUrl })} />
+      <NetlifyPublish
+        config={config}
+        siteId={publish?.netlifySiteId}
+        url={publish?.netlifyUrl}
+        onSaved={(netlifySiteId, netlifyUrl) => setPublish({ netlifySiteId, netlifyUrl })}
+        onForget={() => setPublish({ netlifySiteId: '', netlifyUrl: '' })}
+        onDisconnect={clearAllPublish}
+      />
 
       <div className="design-label" style={{ marginTop: 22 }}>Or export the files</div>
       <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 12 }} onClick={onExport}>

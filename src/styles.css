@@ -750,9 +750,18 @@ input, select, textarea { font: inherit; color: inherit; }
 @keyframes np-spin { to { transform: rotate(360deg); } }
 .np-note { font-size: 11.5px; color: var(--ink-2); line-height: 1.5; margin-top: 8px; }
 .np-live {
+  position: relative;
   border: 1px solid #cfe0ff; background: var(--acc-soft);
   border-radius: 10px; padding: 12px 13px; margin-top: 4px;
 }
+.np-dismiss {
+  position: absolute; top: 7px; right: 7px;
+  border: none; background: none; color: var(--ink-2);
+  width: 22px; height: 22px; border-radius: 6px; font-size: 12px; line-height: 1;
+}
+.np-dismiss:hover { background: #fff; color: var(--ink); }
+.img-btn.danger { color: #c0392b; }
+.img-btn.danger:hover { border-color: #c0392b; background: #fdecec; }
 .np-live-top { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-2); }
 .np-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 3px rgb(21 115 71 / 0.15); }
 .np-url { display: block; font-weight: 700; font-size: 14px; color: var(--acc-deep); text-decoration: none; margin: 5px 0 11px; word-break: break-all; }

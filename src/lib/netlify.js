@@ -65,6 +65,16 @@ export async function disconnectNetlify() {
   await fetch('/api/netlify/disconnect', { method: 'POST' })
 }
 
+// Permanently delete a published site from the user's Netlify account.
+export async function deleteNetlifySite(siteId) {
+  const res = await fetch('/api/netlify/delete-site', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ siteId }),
+  })
+  return j(res)
+}
+
 // utf8 string → base64 (chunked so large files don't blow the call stack).
 function utf8ToBase64(str) {
   const bytes = new TextEncoder().encode(str)

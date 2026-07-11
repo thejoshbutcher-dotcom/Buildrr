@@ -66,11 +66,17 @@ export async function deploy(token, siteId, files) {
     return { key, path, buf, sha: crypto.createHash('sha1').update(buf).digest('hex') }
   })
 
-  // 2. Ensure a site exists.
+  // 2. Ensure a site exists. If the saved site was deleted on Netlify's side
+  // (404), fall through and create a fresh one instead of failing.
   let site
   if (siteId) {
-    site = await api(token, `/sites/${siteId}`)
-  } else {
+    try {
+      site = await api(token, `/sites/${siteId}`)
+    } catch (e) {
+      if (e.status !== 404) throw e
+    }
+  }
+  if (!site) {
     site = await api(token, '/sites', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -122,4 +128,14 @@ export async function deploy(token, siteId, files) {
 
   const url = site.ssl_url || site.url || (site.subdomain ? `https://${site.subdomain}.netlify.app` : dep.ssl_url)
   return { siteId: site.id, url }
+}
+
+// Permanently delete a Netlify site. A 404 means it's already gone — treat as
+// success so the caller can clear its local reference either way.
+export async function deleteSite(token, siteId) {
+  try {
+    await api(token, `/sites/${siteId}`, { method: 'DELETE' })
+  } catch (e) {
+    if (e.status !== 404) throw e
+  }
 }
