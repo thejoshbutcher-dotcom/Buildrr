@@ -113,7 +113,7 @@ const DEMOS = {
 }
 
 const FEATURES = [
-  { demo: 'looks', title: 'Three designer looks', text: 'Editorial, Impact, and Lumen — distinct, modern styles you can swap anytime without losing a word of your copy.' },
+  { demo: 'looks', title: 'Three unique themes', text: 'Editorial, Impact, and Lumen — three distinct looks, plus fully customizable colors and fonts to match your brand.' },
   { demo: 'sections', title: 'Sections that snap', text: 'Drag to reorder, hide what you don’t need, and pull extras — FAQs, testimonials, video, images — from the add-on library.' },
   { demo: 'edit', title: 'Edit on the page', text: 'No forms-on-the-left guesswork. Click the headline, type the headline. What you see is literally what ships.' },
   { demo: 'capture', title: 'Email capture, wired', text: 'ConvertKit, Mailchimp, MailerLite, FormSubmit, or Netlify Forms — with the exact field names each one needs.' },

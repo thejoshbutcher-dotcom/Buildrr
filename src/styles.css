@@ -571,7 +571,7 @@ input, select, textarea { font: inherit; color: inherit; }
   position: absolute; inset: 16px 44px 16px 18px; border-radius: 8px;
   padding: 12px 14px; opacity: 0;
   display: flex; flex-direction: column; gap: 7px;
-  animation: dl-cycle 7.5s infinite;
+  animation: dl-cycle 5.4s infinite;
 }
 .dl-page b { font-size: 20px; line-height: 1; margin-bottom: 2px; }
 .dl-line { height: 6px; border-radius: 3px; background: currentColor; opacity: 0.35; }
@@ -580,22 +580,22 @@ input, select, textarea { font: inherit; color: inherit; }
 .dl-a { background: #f7f2e9; color: #33291d; font-family: Georgia, serif; }
 .dl-a b { font-style: italic; }
 .dl-a .dl-btn { background: #33291d; border-radius: 3px; }
-.dl-b { background: #14161c; color: #f2f2ef; font-family: 'Arial Black', sans-serif; animation-delay: 2.5s; }
+.dl-b { background: #14161c; color: #f2f2ef; font-family: 'Arial Black', sans-serif; animation-delay: 1.8s; }
 .dl-b b { background: #ffd43b; color: #14161c; padding: 0 4px; align-self: flex-start; }
 .dl-b .dl-btn { background: #fff; border-radius: 4px; box-shadow: 3px 3px 0 #ffd43b; }
-.dl-c { background: #fff; color: #33364a; border: 1px solid #e7e8f4; animation-delay: 5s; }
+.dl-c { background: #fff; color: #33364a; border: 1px solid #e7e8f4; animation-delay: 3.6s; }
 .dl-c b { background: var(--acc-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .dl-c .dl-btn { background: var(--acc-grad); border-radius: 999px; }
 @keyframes dl-cycle {
-  0% { opacity: 1; } 29% { opacity: 1; } 33.3% { opacity: 0; }
-  96% { opacity: 0; } 100% { opacity: 1; }
+  0% { opacity: 1; } 20% { opacity: 1; } 33.3% { opacity: 0; }
+  86.7% { opacity: 0; } 100% { opacity: 1; }
 }
 .dl-dots { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); display: grid; gap: 6px; }
-.dl-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line-2); animation: dl-dot 7.5s infinite; }
-.dl-dots i:nth-child(2) { animation-delay: 2.5s; }
-.dl-dots i:nth-child(3) { animation-delay: 5s; }
+.dl-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line-2); animation: dl-dot 5.4s infinite; }
+.dl-dots i:nth-child(2) { animation-delay: 1.8s; }
+.dl-dots i:nth-child(3) { animation-delay: 3.6s; }
 @keyframes dl-dot {
-  0% { background: var(--acc); } 29% { background: var(--acc); }
+  0% { background: var(--acc); } 20% { background: var(--acc); }
   33.3% { background: var(--line-2); } 100% { background: var(--line-2); }
 }
 
