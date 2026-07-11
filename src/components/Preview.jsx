@@ -13,8 +13,11 @@ const previewScript = `<script>
   var st = document.createElement("style");
   st.textContent =
     "[data-edit]{cursor:text;transition:box-shadow .12s ease}" +
-    "[data-edit]:hover{box-shadow:0 0 0 2px rgba(46,123,255,.35);border-radius:4px}" +
-    "[data-edit]:focus{outline:none;box-shadow:0 0 0 2px #2e7bff;border-radius:4px;background:rgba(46,123,255,.05)}";
+    "[data-edit]:hover{box-shadow:0 0 0 2px rgba(46,123,255,.35)}" +
+    "[data-edit]:focus{outline:none;box-shadow:0 0 0 2px #2e7bff;background:rgba(46,123,255,.05)}" +
+    // Only round the highlight box on plain-text editables. Buttons (.btn) keep
+    // their own radius so the pill/rounded shape isn't squared to 4px on hover.
+    "[data-edit]:not(.btn):hover,[data-edit]:not(.btn):focus{border-radius:4px}";
   document.head.appendChild(st);
 
   document.querySelectorAll("[data-edit]").forEach(function (el) {
