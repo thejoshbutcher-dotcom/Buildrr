@@ -175,8 +175,8 @@ export default function App({ onHome = () => {} }) {
         <button className="btn-quiet" onClick={onReset}>
           Reset copy
         </button>
-        <button className="btn-primary" onClick={onExport}>
-          ⤓ Export site
+        <button className="btn-primary" onClick={() => setTab('publish')}>
+          ⚡ Publish
         </button>
       </div>
 
