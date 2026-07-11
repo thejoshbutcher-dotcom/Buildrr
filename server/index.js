@@ -109,24 +109,20 @@ app.post('/api/netlify/deploy', async (req, res) => {
 
 // -- static site + SPA fallback --
 const dist = path.join(root, 'dist')
-
-// Safety net: if the frontend hasn't been built yet (host skipped the build
-// step), build it now so the first boot still serves a working site.
-if (!fs.existsSync(path.join(dist, 'index.html'))) {
-  console.log('dist/ missing — running the production build…')
-  try {
-    const { execSync } = await import('node:child_process')
-    execSync('npm run build', { cwd: root, stdio: 'inherit' })
-  } catch (e) {
-    console.error('Build failed — run `npm run build` before starting.', e.message)
-  }
+const indexHtml = path.join(dist, 'index.html')
+if (!fs.existsSync(indexHtml)) {
+  console.warn('WARNING: dist/index.html not found — run `npm run build`. Serving a placeholder until then.')
 }
 
 app.use(express.static(dist, { index: false }))
 app.get('*', (req, res) => {
-  res.sendFile(path.join(dist, 'index.html'))
+  if (fs.existsSync(indexHtml)) return res.sendFile(indexHtml)
+  res.status(503).type('text').send('Buildrr is starting — the frontend build (dist/) is missing. Run `npm run build`.')
 })
 
-app.listen(PORT, () => {
-  console.log(`Buildrr server on :${PORT}  (Netlify ${isConfigured() ? 'configured' : 'NOT configured'})`)
+// Bind immediately so the host's health check succeeds right away. Never block
+// startup (a slow synchronous task here can trip a 503 from the platform proxy).
+const server = app.listen(PORT, () => {
+  console.log(`Buildrr server listening on :${PORT}  (Netlify ${isConfigured() ? 'configured' : 'NOT configured'})`)
 })
+server.on('error', (e) => console.error('Server failed to start:', e.message))
