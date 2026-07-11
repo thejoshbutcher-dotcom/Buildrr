@@ -63,8 +63,12 @@ section.tight { padding-block: clamp(40px, 6vw, 64px); }
   text-decoration: none;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  /* Keep the rounded corners clipped on a stable compositor layer: gradient
+     backgrounds + border-radius drop their corner clip when a transform first
+     promotes the element to its own layer (pills look square on hover). */
+  transform: translateZ(0);
 }
-.btn:hover { transform: translateY(-2px); }
+.btn:hover { transform: translateY(-2px) translateZ(0); }
 .btn:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
