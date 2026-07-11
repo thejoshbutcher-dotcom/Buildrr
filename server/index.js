@@ -109,6 +109,19 @@ app.post('/api/netlify/deploy', async (req, res) => {
 
 // -- static site + SPA fallback --
 const dist = path.join(root, 'dist')
+
+// Safety net: if the frontend hasn't been built yet (host skipped the build
+// step), build it now so the first boot still serves a working site.
+if (!fs.existsSync(path.join(dist, 'index.html'))) {
+  console.log('dist/ missing — running the production build…')
+  try {
+    const { execSync } = await import('node:child_process')
+    execSync('npm run build', { cwd: root, stdio: 'inherit' })
+  } catch (e) {
+    console.error('Build failed — run `npm run build` before starting.', e.message)
+  }
+}
+
 app.use(express.static(dist, { index: false }))
 app.get('*', (req, res) => {
   res.sendFile(path.join(dist, 'index.html'))
