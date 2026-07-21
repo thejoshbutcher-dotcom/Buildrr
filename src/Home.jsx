@@ -201,7 +201,15 @@ export default function Home({ onOpen }) {
                 <a className="btn-primary big" href="/app" onClick={open}>
                   Open Buildrr →
                 </a>
-                <a className="mkt-ghost" href="#how">
+                <a
+                  className="mkt-ghost"
+                  href="#how"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                    document.getElementById('how')?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' })
+                  }}
+                >
                   See how it works
                 </a>
               </div>

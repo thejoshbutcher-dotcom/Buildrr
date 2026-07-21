@@ -270,7 +270,11 @@ export default function App({ onHome = () => {} }) {
         />
       </div>
 
-      {toastMsg && <div className="toast">{toastMsg}</div>}
+      {toastMsg && (
+        <div className="toast" role="status" aria-live="polite">
+          {toastMsg}
+        </div>
+      )}
     </div>
   )
 }

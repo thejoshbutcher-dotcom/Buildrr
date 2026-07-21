@@ -141,7 +141,7 @@ input[type="text"], input[type="email"], input[type="tel"], textarea {
 input::placeholder, textarea::placeholder { color: var(--mut); }
 .form-card .btn { width: 100%; margin-top: 6px; }
 .privacy-note { margin-top: 14px; font-size: 13px; color: var(--mut); text-align: center; }
-.form-error { margin-top: 12px; font-size: 14px; font-weight: 600; color: #d33; text-align: center; }
+.form-error { margin-top: 12px; font-size: 14px; font-weight: 600; color: #c0392b; text-align: center; }
 
 /* Proof strip */
 .proof { border-block: 1px solid var(--line); padding-block: 22px; }
